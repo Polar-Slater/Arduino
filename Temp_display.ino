@@ -1,15 +1,19 @@
-
-
 #include <Wire.h> 
 #include <Adafruit_MAX31856.h>
 #include <LiquidCrystal_I2C.h>
 
+// SET SPI pin (CS-SS, SDI-MOSI, SDO-MISO, CLK-SCK)
+// CS pin for two SPI device is different
 Adafruit_MAX31856 maxthermo1 = Adafruit_MAX31856(7, 8, 10, 9);
 Adafruit_MAX31856 maxthermo2 = Adafruit_MAX31856(6, 8, 10, 9);
-LiquidCrystal_I2C lcd1(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
+// set the LCD address to 0x27 for a 16 chars and 2 line display
+// TO check address, use i2c address.ino file
+LiquidCrystal_I2C lcd1(0x27,16,2); 
 
 void setup()
 {
+  //initialize the sencor and set the thermocouple type
   maxthermo1.begin();
   maxthermo1.setThermocoupleType (MAX31856_TCTYPE_K);
   maxthermo2.begin();
@@ -32,8 +36,8 @@ void loop()
 {
   lcd1.setCursor(1,0);
   lcd1.print("CJ1 Temp: ");
-  lcd1.println(maxthermo1.readCJTemperature());
-   
+  lcd1.println(maxthermo1.readCJTemperature());     // temperature detected inside the chip (ambient temp)
+                                                   // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
   lcd1.setCursor(1,1);
   lcd1.print("CJ2 Temp: ");
   lcd1.println(maxthermo2.readCJTemperature());
