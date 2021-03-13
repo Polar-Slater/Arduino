@@ -1,6 +1,6 @@
 //*I2C_scanner Written by Banne de Bakker
-  This sketch tests standard 7-bit addresses.
-  Devices with higher bit address might not be seen properly.*/
+//This sketch tests standard 7-bit addresses.
+//Devices with higher bit address might not be seen properly.*/
   
 #include <Wire.h>
 
