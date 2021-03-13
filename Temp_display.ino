@@ -1,3 +1,6 @@
+// Current code works for MKR1000 with two Adafruit MAX31856 Thermocouple Amplifiers (SPI) and one LCD display (i2c)
+// Target: moniter the temperature of two identical furnaces with Type R thermocouples, show the temperature on LCD screen or Serial Moniter
+
 #include <Wire.h> 
 #include <Adafruit_MAX31856.h>
 #include <LiquidCrystal_I2C.h>
@@ -9,7 +12,7 @@ Adafruit_MAX31856 maxthermo2 = Adafruit_MAX31856(6, 8, 10, 9);
 
 // set the LCD address to 0x27 for a 16 chars and 2 line display
 // TO check address, use i2c address.ino file
-LiquidCrystal_I2C lcd1(0x27,16,2); 
+LiquidCrystal_I2C lcd(0x27,16,2); 
 
 void setup()
 {
@@ -19,13 +22,13 @@ void setup()
   maxthermo2.begin();
   maxthermo2.setThermocoupleType (MAX31856_TCTYPE_K);
   
-  lcd1.init();                      // initialize the lcd 
-  lcd1.backlight();
+  lcd.init();                      // initialize the lcd 
+  lcd.backlight();
   
-  lcd1.setCursor(2,0);
-  lcd1.print("TC test");
-  lcd1.setCursor(5,1);
-  lcd1.print("BEGIN");
+  lcd.setCursor(2,0);
+  lcd.print("TC test");
+  lcd.setCursor(5,1);
+  lcd.print("BEGIN");
 
   delay(5000);
 
@@ -34,24 +37,24 @@ void setup()
 
 void loop()
 {
-  lcd1.setCursor(1,0);
-  lcd1.print("CJ1 Temp: ");
-  lcd1.println(maxthermo1.readCJTemperature());     // temperature detected inside the chip (ambient temp)
+  lcd.setCursor(1,0);
+  lcd.print("CJ1 Temp: ");
+  lcd.println(maxthermo1.readCJTemperature());     // temperature detected inside the chip (ambient temp)
                                                    // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
-  lcd1.setCursor(1,1);
-  lcd1.print("CJ2 Temp: ");
-  lcd1.println(maxthermo2.readCJTemperature());
+  lcd.setCursor(1,1);
+  lcd.print("CJ2 Temp: ");
+  lcd.println(maxthermo2.readCJTemperature());
 
-  uint8_t fault = maxthermo1.readFault();
+  uint8_t fault = maxthermo1.readFault();         // Check fault for the first amplifier
   if (fault) {
-    if (fault & MAX31856_FAULT_CJRANGE) lcd1.println("CJRange");
-    if (fault & MAX31856_FAULT_TCRANGE) lcd1.println("TCRange");
-    if (fault & MAX31856_FAULT_CJHIGH)  lcd1.println("CJHIigh");
-    if (fault & MAX31856_FAULT_CJLOW)   lcd1.println("CJLow");
-    if (fault & MAX31856_FAULT_TCHIGH)  lcd1.println("TCHigh");
-    if (fault & MAX31856_FAULT_TCLOW)   lcd1.println("TCLow");
-    if (fault & MAX31856_FAULT_OVUV)    lcd1.println("OVUV");
-    if (fault & MAX31856_FAULT_OPEN)    lcd1.println("Open");
+    if (fault & MAX31856_FAULT_CJRANGE) lcd.println("CJRange");
+    if (fault & MAX31856_FAULT_TCRANGE) lcd.println("TCRange");
+    if (fault & MAX31856_FAULT_CJHIGH)  lcd.println("CJHIigh");
+    if (fault & MAX31856_FAULT_CJLOW)   lcd.println("CJLow");
+    if (fault & MAX31856_FAULT_TCHIGH)  lcd.println("TCHigh");
+    if (fault & MAX31856_FAULT_TCLOW)   lcd.println("TCLow");
+    if (fault & MAX31856_FAULT_OVUV)    lcd.println("OVUV");
+    if (fault & MAX31856_FAULT_OPEN)    lcd.println("Open");
   }
 
   delay(1000);
