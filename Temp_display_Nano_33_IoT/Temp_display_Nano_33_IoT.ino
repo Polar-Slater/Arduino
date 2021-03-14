@@ -1,4 +1,4 @@
-// Current code works for Nano 33 IoT with two Adafruit MAX31856 Thermocouple Amplifiers (SPI) and one LCD display (i2c)
+// Current code works for Nano 33 IoT with two Adafruit MAX31856 Thermocouple Amplifiers (SPI) and one LCD display (i2c, 20X4)
 // Target: moniter the temperature of two identical furnaces with Type R thermocouples, show the temperature on LCD screen or Serial Moniter
 
 #include <Wire.h> 
@@ -40,7 +40,12 @@ void loop()
   lcd.setCursor(1,0);
   lcd.print("CJ_L Temp: ");
   lcd.println(leftthermo.readCJTemperature());     // temperature detected inside the chip (ambient temp)
-                                                   // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
+  lcd.setCursor(1,1);
+  lcd.print("Cell-L Temp: ");
+  lcd.println(leftthermo.readThermocouleTemperature()); // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
+  Serial.print("Cell-L Temp: ");
+  Serial.println(leftthermo.readThermocouleTemperature());
+  
   
    uint8_t fault = leftthermo.readFault();         // Check fault for the first amplifier
   if (fault) {
@@ -54,9 +59,14 @@ void loop()
     if (fault & MAX31856_FAULT_OPEN)    lcd.println("Open");
   }
   
-  lcd.setCursor(1,1);
+  lcd.setCursor(1,2);
   lcd.print("CJ-R Temp: ");
   lcd.println(rightthermo.readCJTemperature());
+  lcd.setCursor(1,3);
+  lcd.print("Cell-R Temp: ");
+  lcd.println(rightthermo.readThermocouleTemperature());
+  Serial.print("Cell-R Temp: ");
+  Serial.println(rightthermo.readThermocouleTemperature());
 
   uint8_t fault = rightthermo.readFault();         // Check fault for the second amplifier
   if (fault) {
