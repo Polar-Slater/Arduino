@@ -7,8 +7,8 @@
 
 // SET SPI pin (CS-SS, SDI-MOSI, SDO-MISO, CLK-SCK)
 // CS pin for two SPI device is different
-Adafruit_MAX31856 maxthermo1 = Adafruit_MAX31856(7, 8, 10, 9);
-Adafruit_MAX31856 maxthermo2 = Adafruit_MAX31856(6, 8, 10, 9);
+Adafruit_MAX31856 leftthermo = Adafruit_MAX31856(7, 8, 10, 9);
+Adafruit_MAX31856 rightthermo = Adafruit_MAX31856(6, 8, 10, 9);
 
 // set the LCD address to 0x27 for a 20 chars and 4 line display
 // TO check address, use i2c address.ino file
@@ -17,10 +17,10 @@ LiquidCrystal_I2C lcd(0x27,20,4);
 void setup()
 {
   //initialize the sencor and set the thermocouple type
-  maxthermo1.begin();
-  maxthermo1.setThermocoupleType (MAX31856_TCTYPE_K);
-  maxthermo2.begin();
-  maxthermo2.setThermocoupleType (MAX31856_TCTYPE_K);
+  leftthermo.begin();
+  leftthermo.setThermocoupleType (MAX31856_TCTYPE_K);
+  rightthermo.begin();
+  rightthermo.setThermocoupleType (MAX31856_TCTYPE_K);
   
   lcd.init();                      // initialize the lcd 
   lcd.backlight();
@@ -39,13 +39,13 @@ void loop()
 {
   lcd.setCursor(1,0);
   lcd.print("CJ1 Temp: ");
-  lcd.println(maxthermo1.readCJTemperature());     // temperature detected inside the chip (ambient temp)
+  lcd.println(leftthermo.readCJTemperature());     // temperature detected inside the chip (ambient temp)
                                                    // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
   lcd.setCursor(1,1);
   lcd.print("CJ2 Temp: ");
-  lcd.println(maxthermo2.readCJTemperature());
+  lcd.println(rightthermo.readCJTemperature());
 
-  uint8_t fault = maxthermo1.readFault();         // Check fault for the first amplifier
+  uint8_t fault = leftthermo.readFault();         // Check fault for the first amplifier
   if (fault) {
     if (fault & MAX31856_FAULT_CJRANGE) lcd.println("CJRange");
     if (fault & MAX31856_FAULT_TCRANGE) lcd.println("TCRange");
