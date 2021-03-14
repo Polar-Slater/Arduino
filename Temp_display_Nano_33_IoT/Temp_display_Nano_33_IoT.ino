@@ -38,14 +38,27 @@ void setup()
 void loop()
 {
   lcd.setCursor(1,0);
-  lcd.print("CJ1 Temp: ");
+  lcd.print("CJ_L Temp: ");
   lcd.println(leftthermo.readCJTemperature());     // temperature detected inside the chip (ambient temp)
                                                    // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
+  
+   uint8_t fault = leftthermo.readFault();         // Check fault for the first amplifier
+  if (fault) {
+    if (fault & MAX31856_FAULT_CJRANGE) lcd.println("CJRange");
+    if (fault & MAX31856_FAULT_TCRANGE) lcd.println("TCRange");
+    if (fault & MAX31856_FAULT_CJHIGH)  lcd.println("CJHIigh");
+    if (fault & MAX31856_FAULT_CJLOW)   lcd.println("CJLow");
+    if (fault & MAX31856_FAULT_TCHIGH)  lcd.println("TCHigh");
+    if (fault & MAX31856_FAULT_TCLOW)   lcd.println("TCLow");
+    if (fault & MAX31856_FAULT_OVUV)    lcd.println("OVUV");
+    if (fault & MAX31856_FAULT_OPEN)    lcd.println("Open");
+  }
+  
   lcd.setCursor(1,1);
-  lcd.print("CJ2 Temp: ");
+  lcd.print("CJ-R Temp: ");
   lcd.println(rightthermo.readCJTemperature());
 
-  uint8_t fault = leftthermo.readFault();         // Check fault for the first amplifier
+  uint8_t fault = rightthermo.readFault();         // Check fault for the second amplifier
   if (fault) {
     if (fault & MAX31856_FAULT_CJRANGE) lcd.println("CJRange");
     if (fault & MAX31856_FAULT_TCRANGE) lcd.println("TCRange");
