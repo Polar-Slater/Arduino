@@ -1,62 +1,66 @@
 // Current code works for MKR1000 with two Adafruit MAX31856 Thermocouple Amplifiers (SPI) and one LCD display (i2c)
 // Target: moniter the temperature of two identical furnaces with Type R thermocouples, show the temperature on LCD screen or Serial Moniter
 
-#include <Wire.h> 
-#include <Adafruit_MAX31856.h>
+#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <Adafruit_MAX31856.h>
 
-// SET SPI pin (CS-SS, SDI-MOSI, SDO-MISO, CLK-SCK)
-// CS pin for two SPI device is different
-Adafruit_MAX31856 maxthermo1 = Adafruit_MAX31856(7, 8, 10, 9);
-Adafruit_MAX31856 maxthermo2 = Adafruit_MAX31856(6, 8, 10, 9);
+// SPI: CS1-SS1, DI-MOSI, DO-MISO, CLK-SCK;
+Adafruit_MAX31856 left = Adafruit_MAX31856(7, 8, 10, 9);
+// SPI: CS1-SS1, DI-MOSI, DO-MISO, CLK-SCK;
+Adafruit_MAX31856 right = Adafruit_MAX31856(6, 8, 10, 9);
+LiquidCrystal_I2C lcd(0x27,20,4);
 
-// set the LCD address to 0x27 for a 16 chars and 2 line display
-// TO check address, use i2c address.ino file
-LiquidCrystal_I2C lcd(0x27,16,2); 
-
-void setup()
-{
-  //initialize the sencor and set the thermocouple type
-  maxthermo1.begin();
-  maxthermo1.setThermocoupleType (MAX31856_TCTYPE_K);
-  maxthermo2.begin();
-  maxthermo2.setThermocoupleType (MAX31856_TCTYPE_K);
+void setup() {
   
-  lcd.init();                      // initialize the lcd 
+  //Initialize the LCD display
+  lcd.init();
   lcd.backlight();
+  Serial.begin(9600);
   
-  lcd.setCursor(2,0);
-  lcd.print("TC test");
-  lcd.setCursor(5,1);
-  lcd.print("BEGIN");
-
-  delay(5000);
-
+  delay(1000);
+  Serial.print("Initialize Sensor");
+  lcd.setCursor(0,0);
+  lcd.print("Initialize Sensor");
+  
+  //Initialize the amplifier
+  left.begin();
+  left.setThermocoupleType(MAX31856_TCTYPE_R);
+  
+  right.begin();
+  right.setThermocoupleType(MAX31856_TCTYPE_R);
+  
+  delay(1000);
+  Serial.print("Initialized");
+  lcd.setCursor(0,1);
+  lcd.print("Initializd");
+    
 }
 
-
-void loop()
-{
-  lcd.setCursor(1,0);
-  lcd.print("CJ1 Temp: ");
-  lcd.println(maxthermo1.readCJTemperature());     // temperature detected inside the chip (ambient temp)
-                                                   // to read the thermocouple temp: maxthermo.readThermocoupleTemperature()
-  lcd.setCursor(1,1);
-  lcd.print("CJ2 Temp: ");
-  lcd.println(maxthermo2.readCJTemperature());
-
-  uint8_t fault = maxthermo1.readFault();         // Check fault for the first amplifier
-  if (fault) {
-    if (fault & MAX31856_FAULT_CJRANGE) lcd.println("CJRange");
-    if (fault & MAX31856_FAULT_TCRANGE) lcd.println("TCRange");
-    if (fault & MAX31856_FAULT_CJHIGH)  lcd.println("CJHIigh");
-    if (fault & MAX31856_FAULT_CJLOW)   lcd.println("CJLow");
-    if (fault & MAX31856_FAULT_TCHIGH)  lcd.println("TCHigh");
-    if (fault & MAX31856_FAULT_TCLOW)   lcd.println("TCLow");
-    if (fault & MAX31856_FAULT_OVUV)    lcd.println("OVUV");
-    if (fault & MAX31856_FAULT_OPEN)    lcd.println("Open");
-  }
-
-  delay(1000);
+void loop() {
   
+  //Diaplay Cold Junction Temperature at 1st line
+  lcd.setCursor(0,0);
+  lcd.print("CJ-L Temp: ");
+  lcd.println(left.readCJTemperature());
+  
+  //Display Thermocouple Temperature at 2nd line
+  lcd.setCursor(0,1);
+  lcd.print("TC-L Temp: ");
+  lcd.println(left.readThermocoupleTemperature());
+  Serial.print("TC-L Temp: ");
+  Serial.println(left.readThermocoupleTemperature());
+  
+  lcd.setCursor(0,2);
+  lcd.print("CJ-R Temp: ");
+  lcd.println(right.readCJTemperature());
+  
+  lcd.setCursor(0,3);
+  lcd.print("TC-R Temp: ");
+  lcd.println(right.readThermocoupleTemperature());
+  Serial.print("TC-R Temp: ");
+  Serial.println(right.readThermocoupleTemperature());
+    
+  delay(1000); //refresh every 1 second
+    
 }
